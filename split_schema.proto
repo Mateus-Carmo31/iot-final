@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package splitlearning;
+
+// The service definition.
+service SplitInferenceService {
+  // Sends client activations to the server
+  rpc SendActivations (ClientRequest) returns (ServerReply) {}
+}
+
+// Efficient message to hold Tensor data
+message Tensor {
+    bool is_null = 1;         // To handle the 'None' cases in your original code
+    bytes raw_data = 2;       // Result of numpy.tobytes()
+    repeated int64 shape = 3; // Dimensions needed to reshape on server side
+    string dtype = 4;         // e.g., "float32", needed for np.frombuffer
+}
+
+// The main request message replacing your JSON dict
+message ClientRequest {
+    string client_name = 1;
+    repeated Tensor layers_output = 2;
+    string img_name = 3;
+    repeated int64 img_shape = 4;
+    repeated int64 orig_shape = 5;
+    int32 last_layer_idx = 6;
+    double timestamp = 7;
+    double inference_time = 8;
+    double message_send_timestamp = 9;
+    double client_ram_mb = 10;
+    double client_cpu_perc = 11;
+}
+
+// Simple server response
+message ServerReply {
+    bool success = 1;
+    string message = 2;
+}
